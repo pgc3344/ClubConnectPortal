@@ -1,0 +1,31 @@
+<!-- templates/set_leader.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">{{ club['name'] }} - 부장 지정</h2>
+        <form method="post">
+            <div class="mb-3">
+                <label for="student_id" class="form-label">부장 선택</label>
+                <select class="form-select" id="student_id" name="student_id" required>
+                    <option value="">부장을 선택하세요</option>
+                    {% for member in members %}
+                    <option value="{{ member['student_id'] }}">
+                        {{ member['name'] }} ({{ member['student_id'] }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">부장 지정</button>
+            <a href="{{ url_for('view_club', club_id=club['id']) }}" class="btn btn-secondary">취소</a>
+        </form>
+
+        {% if members|length == 0 %}
+        <div class="alert alert-warning mt-3">
+            현재 동아리에 승인된 회원이 없습니다.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

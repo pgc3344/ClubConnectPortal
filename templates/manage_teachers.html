@@ -1,0 +1,99 @@
+<!-- templates/manage_teachers.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- 데이터 업로드 섹션 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">선생님 명단 업로드</h3>
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="upload">
+                <div class="input-group">
+                    <input type="file" class="form-control" name="file" accept=".csv" required>
+                    <button type="submit" class="btn btn-primary">업로드</button>
+                </div>
+                <small class="text-muted">
+                    CSV 파일 형식: name,department,group_number<br>
+                    group_number는 1~4 사이의 숫자여야 합니다.<br>
+                    예시: 홍길동,국어과,1
+                </small>
+            </form>
+        </div>
+    </div>
+
+    <!-- 개별 선생님 추가 섹션 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">선생님 추가</h3>
+            <form method="post">
+                <input type="hidden" name="action" value="add">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">이름</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">부서</label>
+                        <input type="text" class="form-control" name="department" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">그룹</label>
+                        <select class="form-select" name="group_number" required>
+                            <option value="">선택</option>
+                            {% for group_id, group_data in teacher_groups.items() %}
+                            <option value="{{ group_id }}">{{ group_data.group_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100">추가</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 선생님 명단 관리 섹션 -->
+    <div class="row">
+        {% for group_id, group_data in teacher_groups.items() %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">{{ group_data.group_name }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for teacher in group_data.teachers %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ teacher.name }}</h6>
+                                    <small class="text-muted">{{ teacher.department }}</small>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <form method="post" class="me-1">
+                                        <input type="hidden" name="action" value="toggle_selection">
+                                        <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+                                        <button type="submit" class="btn {% if teacher.is_selected %}btn-danger{% else %}btn-success{% endif %}">
+                                            {% if teacher.is_selected %}선점 취소{% else %}선점{% endif %}
+                                        </button>
+                                    </form>
+                                    <form method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+                                        <button type="submit" class="btn btn-outline-danger">삭제</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

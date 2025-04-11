@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>부장 공지사항 관리</h2>
+    
+    <form method="POST" class="mb-4">
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="is_important" name="is_important">
+            <label class="form-check-label" for="is_important">중요 공지</label>
+        </div>
+        <button type="submit" class="btn btn-primary">등록</button>
+    </form>
+
+    <div class="list-group">
+        {% for notice in notices %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-1">
+                    {% if notice.is_important %}
+                    <span class="badge bg-danger me-2">중요</span>
+                    {% endif %}
+                    {{ notice.title }}
+                </h5>
+                <form method="POST" action="{{ url_for('delete_leader_notice', notice_id=notice.id) }}" 
+                      onsubmit="return confirm('정말 삭제하시겠습니까?')" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                </form>
+            </div>
+            <p class="mb-1">{{ notice.content | linkify }}</p>
+            <small class="text-muted">{{ notice.created_at }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+<!-- templates/admin_force_actions.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">관리자 강제 조치</h2>
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        주의: 이 페이지의 기능들은 되돌릴 수 없는 강력한 기능입니다. 신중하게 사용해주세요.
+    </div>
+
+    <div class="row">
+        <!-- 동아리 강제 이동 -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">동아리 강제 이동</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" onsubmit="return confirm('정말 이동시키시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                        <input type="hidden" name="action" value="move">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">학번</label>
+                            <input type="text" name="student_id" class="form-control" required
+                                   pattern="\d{5}" title="5자리 학번을 입력하세요">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">현재 동아리</label>
+                            <select name="from_club_id" class="form-select">
+                                <option value="">선택하세요 (강제 배정시 선택 불필요)</option>
+                                {% for club in clubs %}
+                                <option value="{{ club['id'] }}">{{ club['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">이동할 동아리</label>
+                            <select name="to_club_id" class="form-select" required>
+                                <option value="">선택하세요</option>
+                                {% for club in clubs %}
+                                <option value="{{ club['id'] }}">{{ club['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="force_move" class="form-check-input" 
+                                   id="forceMoveCheck">
+                            <label class="form-check-label" for="forceMoveCheck">
+                                현재 동아리 소속과 관계없이 강제로 배정
+                            </label>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="set_as_leader" name="set_as_leader">
+                                <label class="form-check-label" for="set_as_leader">
+                                    강제 이동 후 해당 학생을 부장으로 지정
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                기존 부장이 있는 경우 자동으로 해제됩니다.
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="confirm" class="form-check-input" required
+                                   id="moveConfirm">
+                            <label class="form-check-label" for="moveConfirm">
+                                이 작업이 되돌릴 수 없음을 이해했습니다
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">강제 이동</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 강제 탈퇴 -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">강제 탈퇴</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" onsubmit="return confirm('정말 탈퇴시키시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                        <input type="hidden" name="action" value="withdraw">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">학번</label>
+                            <input type="text" name="student_id" class="form-control" required
+                                   pattern="\d{5}" title="5자리 학번을 입력하세요">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">탈퇴할 동아리</label>
+                            <select name="club_id" class="form-select" required>
+                                <option value="">선택하세요</option>
+                                {% for club in clubs %}
+                                <option value="{{ club['id'] }}">{{ club['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="confirm" class="form-check-input" required
+                                   id="withdrawConfirm">
+                            <label class="form-check-label" for="withdrawConfirm">
+                                이 작업이 되돌릴 수 없음을 이해했습니다
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning">강제 탈퇴</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 동아리 폐지 -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">동아리 폐지</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" onsubmit="return confirm('정말 동아리를 폐지하시겠습니까? 이 작업은 영구적이며 되돌릴 수 없습니다!');">
+                        <input type="hidden" name="action" value="delete_club">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">폐지할 동아리</label>
+                            <select name="club_id" class="form-select" required>
+                                <option value="">선택하세요</option>
+                                {% for club in clubs %}
+                                <option value="{{ club['id'] }}">{{ club['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">관리자 비밀번호</label>
+                            <input type="password" name="admin_password" class="form-control" required>
+                            <small class="text-muted">보안을 위해 관리자 비밀번호를 다시 입력해주세요.</small>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="confirm" class="form-check-input" required
+                                   id="deleteConfirm">
+                            <label class="form-check-label" for="deleteConfirm">
+                                이 작업이 영구적이며 되돌릴 수 없음을 이해했습니다
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-danger">동아리 폐지</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#student-login">학생 로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#admin-login">관리자 로그인</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <!-- 학생 로그인 폼 -->
+                    <div class="tab-pane fade show active" id="student-login">
+                        <form method="POST">
+                            <input type="hidden" name="login_type" value="student">
+                            <div class="mb-3">
+                                <label class="form-label">학번</label>
+                                <input type="text" class="form-control" name="student_id" 
+                                       required pattern="\d{5}" title="5자리 숫자를 입력하세요">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">생년월일</label>
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" name="birth_year" 
+                                               placeholder="년(4자)" required pattern="\d{4}"
+                                               title="4자리 연도를 입력하세요 (예: 2000)">
+                                    </div>
+                                    <div class="col-4">
+                                        <select class="form-select" name="birth_month" required>
+                                            <option value="" disabled selected>월</option>
+                                            {% for month in range(1, 13) %}
+                                                <option value="{{ month }}">{{ month }}월</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" name="birth_day" 
+                                               placeholder="일" required pattern="\d{1,2}"
+                                               title="1~31 사이의 숫자를 입력하세요"
+                                               min="1" max="31">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">로그인</button>
+                        </form>
+                    </div>
+                    
+                    <!-- 관리자 로그인 폼 -->
+                    <div class="tab-pane fade" id="admin-login">
+                        <form method="POST">
+                            <input type="hidden" name="login_type" value="admin">
+                            <div class="mb-3">
+                                <label class="form-label">관리자 ID</label>
+                                <input type="text" class="form-control" name="admin_id" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">비밀번호</label>
+                                <input type="password" class="form-control" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">관리자 로그인</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

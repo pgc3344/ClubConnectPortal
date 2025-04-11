@@ -1,0 +1,48 @@
+<!-- templates/create_activity.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">새 활동 기록</h2>
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">설명</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="activity_date" class="form-label">활동일</label>
+                        <input type="date" class="form-control" id="activity_date" 
+                               name="activity_date" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">첨부파일</label>
+                        <input type="file" class="form-control" id="file" name="file" 
+                               accept=".pdf,.doc,.docx,.txt">
+                        <div class="form-text">
+                            허용된 파일 형식: PDF, DOC, DOCX, TXT<br>
+                            활동 자료, 보고서 등을 첨부할 수 있습니다.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between"></div>
+                        <a href="{{ url_for('manage_club', club_id=club_id) }}" 
+                           class="btn btn-secondary">취소</a>
+                        <button type="submit" class="btn btn-primary">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">관리자 설정</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-4">비밀번호 변경</h4>
+                    <form action="{{ url_for('change_admin_password') }}" method="post" 
+                          onsubmit="return confirm('정말 비밀번호를 변경하시겠습니까?');">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">현재 비밀번호</label>
+                            <input type="password" class="form-control" id="current_password" 
+                                   name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">새 비밀번호</label>
+                            <input type="password" class="form-control" id="new_password" 
+                                   name="new_password" required minlength="8">
+                            <div class="form-text">8자 이상이어야 합니다.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">새 비밀번호 확인</label>
+                            <input type="password" class="form-control" id="confirm_password" 
+                                   name="confirm_password" required minlength="8">
+                        </div>
+                        <button type="submit" class="btn btn-primary">비밀번호 변경</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (newPassword !== confirmPassword) {
+        e.preventDefault();
+        alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+    }
+});
+</script>
+{% endblock %}

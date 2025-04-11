@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ club.name }} 부장 연락처</h5>
+            <p class="card-text">
+                <strong>부장:</strong> {{ club.leader_name }}<br>
+                <strong>연락 방법:</strong> {{ '전화' if club.leader_contact_method == 'phone' else '카카오톡' }}<br>
+                <strong>연락처:</strong> {{ club.leader_contact_info }}
+            </p>
+            <a href="{{ url_for('view_club', club_id=club.id) }}" class="btn btn-primary">동아리 페이지로 돌아가기</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

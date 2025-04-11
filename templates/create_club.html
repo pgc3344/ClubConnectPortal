@@ -1,0 +1,41 @@
+<!-- templates/create_club.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">새 동아리 만들기</h2>
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">동아리 이름</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">동아리 소개</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                rows="5" required></textarea>
+                        <small class="text-muted">동아리의 목적, 활동 내용, 모집 요건 등을 자세히 작성해주세요.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="poster" class="form-label">포스터 (A4 크기 권장)</label>
+                        <input type="file" class="form-control" id="poster" name="poster" 
+                               accept="image/png,image/jpeg,image/gif">
+                        <small class="text-muted">
+                            PNG, JPG, GIF 형식의 이미지 파일을 업로드해주세요. <br>
+                            A4 크기(210mm x 297mm)로 제작된 포스터를 권장합니다.
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="max_members" class="form-label">모집 인원</label>
+                        <input type="number" class="form-control" id="max_members" name="max_members" 
+                               min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">동아리 만들기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

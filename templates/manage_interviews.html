@@ -1,0 +1,99 @@
+<!-- templates/manage_interviews.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">면접 관리</h2>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>학번</th>
+                        <th>이름</th>
+                        <th>신청일</th>
+                        <th>면접 일정</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>{{ app['student_id'] }}</td>
+                        <td>{{ app['name'] }}</td>
+                        <td>{{ app['applied_at'] }}</td>
+                        <td>
+                            {% if app['interview_date'] %}
+                                {{ app['interview_date'] }} {{ app['interview_time'] }}<br>
+                                장소: {{ app['interview_location'] }}
+                            {% else %}
+                                <form method="post" class="row g-3">
+                                    <input type="hidden" name="application_id" value="{{ app['id'] }}">
+                                    <div class="col-md-4">
+                                        <input type="date" class="form-control" name="interview_date" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="time" class="form-control" name="interview_time" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" name="interview_location" 
+                                               placeholder="면접장소" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary">저장</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if app['interview_date'] and not app['interview_result'] %}
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" 
+                                    data-bs-target="#resultModal{{ app['id'] }}">
+                                결과 입력
+                            </button>
+                            
+                            <!-- 결과 입력 모달 -->
+                            <div class="modal fade" id="resultModal{{ app['id'] }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">면접 결과 입력</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form action="{{ url_for('update_interview_result', club_id=club_id) }}" 
+                                              method="post">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="application_id" value="{{ app['id'] }}">
+                                                <div class="mb-3">
+                                                    <label class="form-label">면접 평가</label>
+                                                    <textarea class="form-control" name="interview_result" 
+                                                              rows="3" required></textarea>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">최종 결과</label>
+                                                    <select class="form-select" name="final_result" required>
+                                                        <option value="accepted">합격</option>
+                                                        <option value="rejected">불합격</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" 
+                                                        data-bs-dismiss="modal">취소</button>
+                                                <button type="submit" class="btn btn-primary">저장</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

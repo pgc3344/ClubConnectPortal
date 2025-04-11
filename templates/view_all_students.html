@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>전체 학생 명단</h2>
+    
+    <!-- 검색 폼 -->
+    <form class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control" name="search" value="{{ search }}" 
+                   placeholder="학번, 이름, 동아리명으로 검색">
+            <button class="btn btn-primary" type="submit">검색</button>
+            {% if search %}
+                <a href="{{ url_for('view_all_students') }}" class="btn btn-secondary">초기화</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="{{ url_for('view_all_students', sort='student_id', order='asc' if sort != 'student_id' or order == 'desc' else 'desc', search=search) }}">
+                            학번
+                            {% if sort == 'student_id' %}
+                                {% if order == 'asc' %}↑{% else %}↓{% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ url_for('view_all_students', sort='name', order='asc' if sort != 'name' or order == 'desc' else 'desc', search=search) }}">
+                            이름
+                            {% if sort == 'name' %}
+                                {% if order == 'asc' %}↑{% else %}↓{% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>생년월일</th>
+                    <th>가입 동아리</th>
+                    <th>부장 직위</th>
+                    <th>대기 신청</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.student_id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.birth_date }}</td>
+                    <td>{{ student.clubs_str or '미가입' }}</td>
+                    <td>
+                        {% if student.club_name %}
+                            {{ student.club_name }} 부장
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if student.pending_applications > 0 %}
+                            <span class="badge bg-warning">{{ student.pending_applications }}건</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

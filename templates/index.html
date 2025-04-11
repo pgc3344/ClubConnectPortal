@@ -1,0 +1,99 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+{% if pending_acceptance %}
+<div class="alert alert-warning">
+    <strong>승인 대기 중인 동아리 신청이 있습니다!</strong>
+    <a href="{{ url_for('view_club', club_id=pending_acceptance.club_id) }}" class="btn btn-success btn-sm ms-3">
+        {{ pending_acceptance.club_name }} 동아리 최종 승인하기
+    </a>
+</div>
+{% endif %}
+
+{% if session.club_leader_of and unread_notices_count > 0 %}
+<div class="alert alert-info">
+    <i class="fas fa-bell"></i>
+    읽지 않은 부장 공지사항이 {{ unread_notices_count }}개 있습니다.
+    <a href="{{ url_for('view_leader_notices') }}" class="alert-link">
+        확인하러 가기
+    </a>
+</div>
+{% endif %}
+
+<!-- 공지사항 섹션 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h3 class="card-title">공지사항</h3>
+        <div class="list-group">
+            {% for notice in notices %}
+            <div class="list-group-item">
+                <h5 class="mb-1">
+                    {% if notice.is_important %}
+                    <span class="badge bg-danger me-2">중요</span>
+                    {% endif %}
+                    {{ notice.title }}
+                </h5>
+                <!-- nl2br 필터만 사용하도록 수정 -->
+                <p class="mb-1">{{ notice.content | linkify | safe }}</p>
+                <small class="text-muted">{{ notice.created_at }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% if not notices %}
+        <div class="alert alert-light">
+            등록된 공지사항이 없습니다.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>동아리 목록</h3>
+        {% if session.is_admin %}
+        <a href="{{ url_for('create_club') }}" class="btn btn-primary">
+            새 동아리 만들기
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="row">
+        {% for club in clubs %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if club.poster_path %}
+                <img src="{{ url_for('uploads', filename=club.poster_path.split('/')[-1].replace('\\', '/')) }}" 
+                     class="card-img-top" alt="동아리 포스터" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ club.name }}</h5>
+                    <p class="card-text">{{ club.description[:100] }}{% if club.description|length > 100 %}...{% endif %}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            현재 인원: {{ club.current_members }}/{{ club.max_members }}명
+                            {% if club.is_recruiting %}
+                                <span class="badge bg-success">모집중</span>
+                            {% else %}
+                                <span class="badge bg-secondary">모집마감</span>
+                            {% endif %}
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="btn-group">
+                        <a href="{{ url_for('view_club', club_id=club.id) }}" class="btn btn-primary">자세히 보기</a>
+                        {% if club.is_recruiting and session.user_id and not session.is_admin %}
+                            <a href="{{ url_for('view_club', club_id=club.id) }}#apply" class="btn btn-success">신청하기</a>
+                        {% endif %}
+                        {% if club.leader_contact_info %}
+                            <a href="{{ url_for('view_leader_contact', club_id=club.id) }}" class="btn btn-info">연락하기</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

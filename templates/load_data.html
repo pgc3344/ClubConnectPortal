@@ -1,0 +1,126 @@
+<!-- templates/load_data.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>데이터 관리</h2>
+    
+    <!-- 학생 데이터 관리 섹션 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>학생 데이터</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" class="mb-3">
+                <input type="hidden" name="action" value="upload_students">
+                <div class="row align-items-end">
+                    <div class="col-md-6">
+                        <label for="student-file" class="form-label">CSV 파일 업로드</label>
+                        <input type="file" class="form-control" id="student-file" name="file" accept=".csv">
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary">업로드</button>
+                        <a href="{{ url_for('view_all_students') }}" class="btn btn-secondary">전체 학생 명단 조회</a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- 개별 학생 추가 -->
+            <h4>학생 추가</h4>
+            <form method="post" class="mb-3">
+                <input type="hidden" name="action" value="add_student">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">학번</label>
+                            <input type="text" name="student_id" class="form-control" 
+                                   pattern="\d{5}" title="5자리 숫자" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">이름</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">생년월일</label>
+                            <input type="date" name="birth_date" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">학생 추가</button>
+            </form>
+
+            <!-- 학생 삭제 -->
+            <h4>학생 삭제</h4>
+            <form method="post" onsubmit="return confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                <input type="hidden" name="action" value="delete_student">
+                <div class="mb-3">
+                    <label class="form-label">학번</label>
+                    <input type="text" name="student_id" class="form-control" 
+                           pattern="\d{5}" title="5자리 숫자" required>
+                    <small class="text-danger">
+                        * 주의: 동아리에 가입된 학생은 삭제할 수 없습니다.
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-danger">학생 삭제</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 선생님 데이터 관리 섹션 -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">선생님 데이터 관리</h2>
+            
+            <!-- 선생님 일괄 업로드 -->
+            <form method="post" enctype="multipart/form-data" class="mb-4">
+                <input type="hidden" name="action" value="upload_teachers">
+                <div class="mb-3">
+                    <label class="form-label">선생님 CSV 파일 업로드</label>
+                    <input type="file" class="form-control" name="file" accept=".csv" required>
+                    <small class="text-muted">
+                        CSV 파일 형식: name,department,group_number<br>
+                        예시: 홍길동,국어과,1
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary">업로드</button>
+            </form>
+
+            <!-- 개별 선생님 추가 -->
+            <h4>선생님 추가</h4>
+            <form method="post">
+                <input type="hidden" name="action" value="add_teacher">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">이름</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">부서</label>
+                            <input type="text" name="department" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">그룹 번호</label>
+                            <select name="group_number" class="form-select" required>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">선생님 추가</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

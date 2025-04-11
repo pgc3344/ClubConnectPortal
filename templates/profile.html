@@ -1,0 +1,105 @@
+<!-- templates/profile.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">내 프로필</h2>
+                <table class="table">
+                    <tr>
+                        <th width="30%">학번:</th>
+                        <td>{{ user.student_id }}</td>
+                    </tr>
+                    <tr>
+                        <th>이름:</th>
+                        <td>{{ user.name }}</td>
+                    </tr>
+                    {% if user.club_leader_of %}
+                    <tr>
+                        <th>부장:</th>
+                        <td>
+                            <span class="badge bg-primary">부장</span>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% if user.is_admin %}
+                    <tr>
+                        <th>권한:</th>
+                        <td>
+                            <span class="badge bg-danger">관리자</span>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+
+                <h3 class="mt-4">동아리 신청 현황</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>동아리명</th>
+                                <th>연락처</th>
+                                <th>신청일</th>
+                                <th>상태</th>
+                                <th>결과</th>
+                                <th>액션</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td>{{ app.name }}</td>
+                                <td>
+                                    {% if app.contact_info %}
+                                        {% if app.contact_method == 'phone' %}
+                                            📞 {{ app.contact_info }}
+                                        {% else %}
+                                            카카오톡: {{ app.contact_info }}
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ app.applied_at }}</td>
+                                <td>
+                                    {% if app.status == 'pending' %}
+                                        <span class="badge bg-warning">검토중</span>
+                                    {% elif app.status == 'waiting_acceptance' %}
+                                        <span class="badge bg-info">승인됨 (수락 대기)</span>
+                                    {% elif app.status == 'approved' %}
+                                        <span class="badge bg-success">최종 승인</span>
+                                    {% elif app.status == 'withdrawn' %}
+                                        <span class="badge bg-secondary">탈퇴</span>
+                                    {% elif app.status == 'cancelled' %}
+                                        <span class="badge bg-warning">취소됨</span>
+                                    {% elif app.status == 'club_deleted' %}
+                                        <span class="badge bg-danger">동아리 폐지</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if app.final_result %}
+                                        {{ app.final_result }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if app.status == 'approved' %}
+                                        <form action="{{ url_for('withdraw_club', application_id=app.id) }}" 
+                                              method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까? 주의: 관리자의 허가하에 사용하세요.');">
+                                            <button type="submit" class="btn btn-danger btn-sm">탈퇴</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

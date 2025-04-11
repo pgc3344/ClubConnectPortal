@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>데이터 내보내기</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">전교생 명단</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="{{ url_for('export_data', data_type='all_students') }}" class="btn btn-primary">
+                        <i class="fas fa-users"></i> 전교생 동아리 배정 현황
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">동아리별 명단</h5>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for club in clubs %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">{{ club.name }}</h6>
+                        <div class="btn-group">
+                            <a href="{{ url_for('export_data', data_type='club_members', club_id=club.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i> 회원 명단
+                            </a>
+                            <a href="{{ url_for('export_data', data_type='club_members_with_contact', club_id=club.id) }}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-phone"></i> 연락처 포함
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">기타 데이터</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="{{ url_for('export_data', data_type='unregistered') }}" class="btn btn-warning mb-2 w-100">
+                        <i class="fas fa-user-slash"></i> 미배정 학생 명단
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for('export_data', data_type='teachers') }}" class="btn btn-info mb-2 w-100">
+                        <i class="fas fa-chalkboard-teacher"></i> 선생님 명단
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for('export_data', data_type='applications') }}" class="btn btn-secondary mb-2 w-100">
+                        <i class="fas fa-clipboard-list"></i> 전체 신청 내역
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for('export_data', data_type='activities') }}" class="btn btn-success mb-2 w-100">
+                        <i class="fas fa-calendar-alt"></i> 동아리 활동 내역
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

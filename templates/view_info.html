@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">동아리 활동 정보</h2>
+    
+    {% if session.is_admin %}
+    <div class="mb-3">
+        <a href="{{ url_for('manage_info') }}" class="btn btn-primary">
+            <i class="fas fa-cog"></i> 정보 관리
+        </a>
+    </div>
+    {% endif %}
+    
+    <div class="accordion" id="infoAccordion">
+        {% for category, infos in categorized_infos.items() %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ loop.index }}">
+                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" 
+                        type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse{{ loop.index }}">
+                    {{ category }}
+                </button>
+            </h2>
+            <div id="collapse{{ loop.index }}" 
+                 class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                 data-bs-parent="#infoAccordion">
+                <div class="accordion-body">
+                    {% for info in infos %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ info.title }}</h5>
+                            <div class="card-text">{{ info.content | nl2br }}</div>
+                            <p class="text-muted small mt-2">
+                                최종 수정: {{ info.updated_at }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

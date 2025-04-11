@@ -1,0 +1,150 @@
+<!-- templates/view_teachers.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">고운고등학교 전체 선생님 명단</h2>
+
+    <!-- 통합 검색 입력창 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" 
+                       id="globalSearch" 
+                       class="form-control" 
+                       placeholder="이름 또는 부서로 검색...">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="text-end">
+                <button id="expandAll" class="btn btn-outline-primary">
+                    <i class="fas fa-expand-alt"></i> 모든 그룹 펼치기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전체 통계 -->
+    <div class="alert alert-info mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <i class="fas fa-users"></i> 전체 선생님: 
+                {% set total = namespace(count=0, available=0, selected=0) %}
+                {% for group_id, group_data in teacher_groups.items() %}
+                    {% set total.count = total.count + group_data.teachers|length %}
+                    {% set total.available = total.available + group_data.teachers|selectattr('is_selected', 'equalto', false)|list|length %}
+                    {% set total.selected = total.selected + group_data.teachers|selectattr('is_selected', 'equalto', true)|list|length %}
+                {% endfor %}
+                <strong>{{ total.count }}명</strong>
+            </div>
+            <div class="col-md-4">
+                <i class="fas fa-check-circle text-success"></i> 미배정: 
+                <strong>{{ total.available }}명</strong>
+            </div>
+            <div class="col-md-4">
+                <i class="fas fa-times-circle text-danger"></i> 배정완료: 
+                <strong>{{ total.selected }}명</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- 아코디언으로 변경된 그룹별 목록 -->
+    <div class="accordion" id="teacherGroups">
+        {% for group_id, group_data in teacher_groups.items() %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ group_id }}">
+                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" 
+                        data-bs-toggle="collapse" data-bs-target="#collapse{{ group_id }}">
+                    {{ group_data.group_name }}
+                    <span class="badge bg-secondary ms-2">{{ group_data.teachers|length }}</span>
+                    <span class="badge bg-success ms-1">미배정: {{ group_data.teachers|selectattr('is_selected', 'equalto', false)|list|length }}</span>
+                    <span class="badge bg-danger ms-1">배정완료: {{ group_data.teachers|selectattr('is_selected', 'equalto', true)|list|length }}</span>
+                </button>
+            </h2>
+            <div id="collapse{{ group_id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                 data-bs-parent="#teacherGroups">
+                <div class="accordion-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>이름</th>
+                                    <th>내용</th>
+                                    <th class="text-center">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody class="teacher-list">
+                                {% for teacher in group_data.teachers %}
+                                <tr class="teacher-row">
+                                    <td>
+                                        <i class="fas fa-user me-2"></i>
+                                        {{ teacher.name }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">
+                                            {{ teacher.department }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge {% if teacher.is_selected %}bg-danger{% else %}bg-success{% endif %}">
+                                            {{ teacher.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 향상된 JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const globalSearch = document.getElementById('globalSearch');
+    const expandAllBtn = document.getElementById('expandAll');
+    let isExpanded = false;
+    
+    // 전체 검색 기능
+    globalSearch.addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        document.querySelectorAll('.teacher-row').forEach(row => {
+            const name = row.querySelector('td:first-child').textContent.toLowerCase();
+            const department = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const match = name.includes(searchText) || department.includes(searchText);
+            row.style.display = match ? '' : 'none';
+        });
+        
+        // 검색어가 있으면 모든 아코디언을 펼침
+        if (searchText) {
+            document.querySelectorAll('.accordion-collapse').forEach(collapse => {
+                collapse.classList.add('show');
+            });
+        }
+    });
+    
+    // 모든 그룹 펼치기/접기 토글
+    expandAllBtn.addEventListener('click', function() {
+        const collapses = document.querySelectorAll('.accordion-collapse');
+        isExpanded = !isExpanded;
+        
+        collapses.forEach(collapse => {
+            if (isExpanded) {
+                collapse.classList.add('show');
+                this.innerHTML = '<i class="fas fa-compress-alt"></i> 모든 그룹 접기';
+            } else {
+                collapse.classList.remove('show');
+                this.innerHTML = '<i class="fas fa-expand-alt"></i> 모든 그룹 펼치기';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

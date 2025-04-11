@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">정보 관리</h2>
+    
+    <!-- 새 정보 추가 폼 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">새 정보 추가</h3>
+            <form method="post">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">제목</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">카테고리</label>
+                        <select name="category" class="form-select" required>
+                            <option value="일반 안내">일반 안내</option>
+                            <option value="규칙">규칙</option>
+                            <option value="일정">일정</option>
+                            <option value="FAQ">FAQ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">순서</label>
+                        <input type="number" name="order_num" class="form-control" value="0">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">내용</label>
+                    <textarea name="content" class="form-control" rows="5" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">추가</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 기존 정보 목록 -->
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">정보 목록</h3>
+            {% for info in infos %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">{{ info.title }}</h5>
+                        <span class="badge bg-secondary">{{ info.category }}</span>
+                    </div>
+                    
+                    <p class="card-text">{{ info.content | nl2br }}</p>
+                    <p class="text-muted small">순서: {{ info.order_num }}</p>
+                    
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                onclick='editInfo({{ info|tojson|safe }})'>
+                            수정
+                        </button>
+                        <form method="post" class="d-inline" 
+                              onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="info_id" value="{{ info.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 수정 모달 -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">정보 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="info_id" id="edit_info_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">제목</label>
+                            <input type="text" name="title" id="edit_title" 
+                                   class="form-control" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">카테고리</label>
+                            <select name="category" id="edit_category" 
+                                    class="form-select" required>
+                                <option value="일반 안내">일반 안내</option>
+                                <option value="규칙">규칙</option>
+                                <option value="일정">일정</option>
+                                <option value="FAQ">FAQ</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">순서</label>
+                            <input type="number" name="order_num" id="edit_order_num" 
+                                   class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">내용</label>
+                        <textarea name="content" id="edit_content" 
+                                class="form-control" rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" 
+                            data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editInfo(info) {
+    document.getElementById('edit_info_id').value = info.id;
+    document.getElementById('edit_title').value = info.title;
+    document.getElementById('edit_category').value = info.category;
+    document.getElementById('edit_order_num').value = info.order_num;
+    document.getElementById('edit_content').value = info.content;
+    
+    new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+</script>
+{% endblock %}

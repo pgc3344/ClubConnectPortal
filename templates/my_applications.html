@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">내 동아리 신청 현황</h2>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>동아리</th>
+                        <th>신청일</th>
+                        <th>상태</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>{{ app.club_name }}</td>
+                        <td>{{ app.applied_at }}</td>
+                        <td>
+                            {% if app.status == 'pending' %}
+                                <span class="badge bg-warning">검토중</span>
+                            {% elif app.status == 'waiting_acceptance' %}
+                                <span class="badge bg-info">승인됨 (수락 대기)</span>
+                            {% elif app.status == 'approved' %}
+                                <span class="badge bg-success">최종 승인</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if app.status == 'waiting_acceptance' %}
+                                {% if app.current_members < app.max_members %}
+                                <form method="post" action="{{ url_for('accept_application', application_id=app.id) }}">
+                                    <button type="submit" class="btn btn-primary btn-sm"
+                                            onclick="return confirm('이 동아리를 선택하면 다른 동아리 신청은 자동으로 취소됩니다. 계속하시겠습니까?')">
+                                        이 동아리 선택하기
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-danger">정원 마감</span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">{{ club.name }} - 신청자 관리</h2>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>학번</th>
+                        <th>이름</th>
+                        <th>연락처</th>
+                        <th>신청일</th>
+                        <th>상태</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>{{ app.student_id }}</td>
+                        <td>{{ app.student_name }}</td>
+                        <td>
+                            {% if app.contact_method == 'phone' %}
+                                📞 {{ app.contact_info }}
+                            {% else %}
+                                카카오톡: {{ app.contact_info }}
+                            {% endif %}
+                        </td>
+                        <td>{{ app.applied_at }}</td>
+                        <td>
+                            {% if app.status == 'pending' %}
+                                <span class="badge bg-warning">검토중</span>
+                            {% elif app.status == 'waiting_acceptance' %}
+                                <span class="badge bg-info">승인됨 (학생 수락 대기)</span>
+                            {% elif app.status == 'approved' %}
+                                <span class="badge bg-success">최종 승인</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if app.status == 'pending' %}
+                            <form method="post" action="{{ url_for('approve_application', club_id=club.id, application_id=app.id) }}" 
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-primary btn-sm">승인하기</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

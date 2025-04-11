@@ -1,0 +1,108 @@
+<!-- templates/manage_club.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ club.name }} 관리</h2>
+    
+    <!-- 모집 상태 토글 버튼 추가 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">모집 상태</h5>
+            <p class="card-text">
+                현재 상태: 
+                {% if club.is_recruiting %}
+                    <span class="badge bg-success">모집 중</span>
+                {% else %}
+                    <span class="badge bg-danger">모집 마감</span>
+                {% endif %}
+            </p>
+            <form action="{{ url_for('toggle_recruiting', club_id=club.id) }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-primary" onclick="return confirm('모집 상태를 변경하시겠습니까?')">
+                    {% if club.is_recruiting %}
+                        모집 마감하기
+                    {% else %}
+                        모집 시작하기
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">부장 연락처 관리</h5>
+            {% if not club.leader_contact_info %}
+                <div class="alert alert-warning">
+                    아직 연락처를 등록하지 않았습니다. 신입 부원들의 연락을 위해 연락처를 등록해주세요.
+                </div>
+            {% endif %}
+            <form action="{{ url_for('set_leader_contact', club_id=club.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="contact_info" class="form-label">연락처</label>
+                    <input type="text" class="form-control" id="contact_info" 
+                           name="contact_info" value="{{ club.leader_contact_info or '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="contact_method" class="form-label">선호하는 연락 방법</label>
+                    <select class="form-select" id="contact_method" name="contact_method">
+                        <option value="phone" {% if club.leader_contact_method == 'phone' %}selected{% endif %}>전화</option>
+                        <option value="kakao" {% if club.leader_contact_method == 'kakao' %}selected{% endif %}>카카오톡</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">연락처 저장</button>
+            </form>
+        </div>
+    </div>
+    
+    <h3>신청 목록</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>학번</th>
+                <th>이름</th>
+                <th>연락처</th>
+                <th>신청일</th>
+                <th>상태</th>
+                <th>액션</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+                <tr>
+                    <td>{{ application.student_id }}</td>
+                    <td>{{ application.student_name }}</td>
+                    <td>{{ application.contact_info }}</td>
+                    <td>{{ application.applied_at }}</td>
+                    <td>
+                        {% if application.status == 'pending' %}
+                            검토 중
+                        {% elif application.status == 'waiting_acceptance' %}
+                            승인됨 (수락 대기)
+                        {% elif application.status == 'approved' %}
+                            최종 승인
+                        {% elif application.status == 'rejected' %}
+                            거절됨
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if application.status == 'pending' %}
+                            <form action="{{ url_for('approve_application', club_id=club.id, application_id=application.id) }}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-success btn-sm">승인</button>
+                            </form>
+                            <form action="{{ url_for('reject_application', club_id=club.id, application_id=application.id) }}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('정말 거절하시겠습니까?')">거절</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- ...existing code for other sections... -->
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>중요 공지사항</h2>
+    {% if notices %}
+        <div class="list-group">
+        {% for notice in notices %}
+            <div class="list-group-item">
+                <h5 class="mb-1">{{ notice.title }}</h5>
+                <p class="mb-1">{{ notice.content|linkify|safe }}</p>
+                <small class="text-muted">{{ notice.created_at }}</small>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>현재 중요 공지사항이 없습니다.</p>
+    {% endif %}
+</div>
+{% endblock %}

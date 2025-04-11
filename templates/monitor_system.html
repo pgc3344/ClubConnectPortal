@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">시스템 모니터링</h2>
+    
+    <!-- 현재 상태 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">활성 사용자</h5>
+                    <div class="display-4 text-info">
+                        {{ stats.current.active_users }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">요청/분</h5>
+                    <div class="display-4 text-warning">
+                        {{ stats.current.requests_per_minute }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사용자 활동 그래프 -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">사용자 활동 추이</h5>
+            <canvas id="userChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const historyData = {{ stats.history | tojson }};
+    const labels = historyData.map(d => {
+        const date = new Date(d.timestamp);
+        return date.toLocaleTimeString();
+    });
+    
+    // 사용자 활동 차트
+    new Chart(document.getElementById('userChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '활성 사용자',
+                data: historyData.map(d => d.active_users),
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }, {
+                label: '요청/분',
+                data: historyData.map(d => d.requests_per_minute),
+                borderColor: 'rgb(255, 159, 64)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+
+// 30초마다 페이지 자동 새로고침
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

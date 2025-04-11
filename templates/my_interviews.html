@@ -1,0 +1,97 @@
+<!-- templates/my_interviews.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">내 면접 일정</h2>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>동아리</th>
+                                <th>면접 일시</th>
+                                <th>면접 장소</th>
+                                <th>상태</th>
+                                <th>결과</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interview in interviews %}
+                            <tr>
+                                <td>{{ interview['club_name'] }}</td>
+                                <td>
+                                    {% if interview['interview_date'] %}
+                                        {{ interview['interview_date'] }} {{ interview['interview_time'] }}
+                                    {% else %}
+                                        미정
+                                    {% endif %}
+                                </td>
+                                <td>{{ interview['interview_location'] or '미정' }}</td>
+                                <td>
+                                    {% if interview['status'] == 'pending' %}
+                                        <span class="badge bg-warning">대기중</span>
+                                    {% elif interview['status'] == 'interviewing' %}
+                                        <span class="badge bg-primary">면접 예정</span>
+                                    {% elif interview['status'] == 'completed' %}
+                                        <span class="badge bg-success">완료</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if interview['status'] == 'completed' %}
+                                        {% if interview['final_result'] == 'accepted' %}
+                                            <span class="badge bg-success">합격</span>
+                                        {% elif interview['final_result'] == 'rejected' %}
+                                            <span class="badge bg-danger">불합격</span>
+                                        {% endif %}
+                                        {% if interview['interview_result'] %}
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#feedbackModal{{ interview['id'] }}">
+                                                면접 평가 보기
+                                            </button>
+                                            
+                                            <!-- 면접 평가 모달 -->
+                                            <div class="modal fade" id="feedbackModal{{ interview['id'] }}" 
+                                                 tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">면접 평가</h5>
+                                                            <button type="button" class="btn-close" 
+                                                                    data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>{{ interview['interview_result']|nl2br }}</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" 
+                                                                    data-bs-dismiss="modal">닫기</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">대기중</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not interviews %}
+                <div class="alert alert-info">
+                    아직 예정된 면접이 없습니다.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
